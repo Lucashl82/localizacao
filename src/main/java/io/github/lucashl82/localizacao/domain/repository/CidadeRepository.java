@@ -1,6 +1,7 @@
 package io.github.lucashl82.localizacao.domain.repository;
 
 import io.github.lucashl82.localizacao.domain.entity.Cidade;
+import io.github.lucashl82.localizacao.domain.repository.projections.CidadeProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,6 +13,9 @@ import java.util.List;
 
 
 public interface CidadeRepository extends JpaRepository<Cidade, Long>, JpaSpecificationExecutor<Cidade> {
+
+    @Query(nativeQuery = true, value = "select c.id_cidade as id, c.nome from tb_cidade as c where c.nome =:nome ")
+    List<CidadeProjection> findByNomeSqlNativo(String nome);
 
     //busca pelo nome exato
     List<Cidade> findByNome(String nome);

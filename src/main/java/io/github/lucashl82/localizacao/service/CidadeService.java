@@ -6,6 +6,7 @@ import static io.github.lucashl82.localizacao.domain.repository.specs.CidadeSpec
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -25,6 +26,13 @@ public class CidadeService {
     public void listarCidadesPorNome(){
         Pageable pageable = PageRequest.of(0, 10);
         repository.findByNomeLike("%a%", pageable).forEach(System.out::println);
+    }
+
+    public void listarCidadesPorNomeSQL(){
+        repository.findByNomeSqlNativo("São Paulo")
+                .stream()
+                .map(cidadeProjection -> new Cidade(cidadeProjection.getId(), cidadeProjection.getNome(), null))
+                .forEach(System.out::println);
     }
 
     public void listarCidadesPorHabitantes(){
@@ -48,7 +56,25 @@ public class CidadeService {
     public void listarCidadesByNomeSpec(){
 
         repository
-                .findAll(nomeEqual("São Paulo").or(habitantesGreaterThan(1000)))
+                .findAll(nomeEqual("São Paulo").or(habitantesGreaterThan(1000L)))
                 .forEach(System.out::println);
+    }
+
+    public void listarCidadesSpecsFiltroDinamico(Cidade filtro){
+        Specification<Cidade> specs = Specification.where((root, query, cb) -> cb.conjunction());
+
+        if(filtro.getId() != null){
+            specs = specs.and(idEqual(filtro.getId()));
+        }
+
+        if(StringUtils.hasText(filtro.getNome())){
+            specs = specs.and(nomeLike(filtro.getNome()));
+        }
+
+        if (filtro.getHabitantes()!=null){
+            specs= specs.and(habitantesGreaterThan(filtro.getHabitantes()));
+        }
+
+        repository.findAll(specs).forEach(System.out::println);
     }
 }
