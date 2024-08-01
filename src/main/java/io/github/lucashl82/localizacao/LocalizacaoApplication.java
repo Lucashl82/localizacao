@@ -2,6 +2,7 @@ package io.github.lucashl82.localizacao;
 
 import io.github.lucashl82.localizacao.domain.entity.Cidade;
 import io.github.lucashl82.localizacao.domain.repository.CidadeRepository;
+import io.github.lucashl82.localizacao.service.CidadeService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,29 +13,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LocalizacaoApplication implements CommandLineRunner {
 
 	@Autowired
-	private CidadeRepository cidadeRepository;
+	private CidadeService cidadeService;
 
 	@Override
 	public void run(String... args) throws Exception {
-		listarCidadesPorNome();
-	}
-
-	void listarCidadesPorNome(){
-		cidadeRepository.findByNomeLike("%a%").forEach(System.out::println);
-	}
-
-	void listarCidadesPorHabitantes(){
-		cidadeRepository.findByHabitantes(7000000L).forEach(System.out::println);
-	}
-
-	@Transactional
-	void salvarCidade(){
-		var cidade = new Cidade(1L, "Contagem", 621865L);
-		cidadeRepository.save(cidade);
-	}
-
-	void listarCidades(){
-		cidadeRepository.findAll().forEach(System.out::println);
+		Cidade cidade = new Cidade(null, "porto", null);
+		cidadeService.listarCidadesByNomeSpec();
 	}
 
 	public static void main(String[] args) {
